@@ -87,7 +87,6 @@ const purchasedItems = [
         }
       }
     } catch (e) {
-      logger.error('Произошла ошибка. Программа остановлена.');
       clearInterval(timer);
     }
   }, 1000);
