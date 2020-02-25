@@ -29,6 +29,7 @@ const logger = winston.createLogger({
       chatId: process.env.telegram_chat_id,
       level: 'debug',
       disableNotification: true,
+      template: '{message}',
     }),
   ],
 });
@@ -57,7 +58,7 @@ const purchasedItems = [
   const profiles = await t.getProfiles();
   const profile = profiles.find((p) => p.savage);
   await t.selectProfile(profile);
-  logger.debug(`> Привет ${profile.Info.Nickname}`);
+  logger.debug(`Привет ${profile.Info.Nickname}`);
 
   await t.getI18n('ru');
 
@@ -74,14 +75,14 @@ const purchasedItems = [
 
         if (search.offers.length) {
           const offer = search.offers[0];
-          logger.verbose(`> Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
+          logger.verbose(`Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
           // eslint-disable-next-line no-await-in-loop
           const response = await offer.buyWithRoubles(offer.items.length);
 
           if (response.items.new) {
-            logger.info(`> Куплено: ${purchasedItem.name}. ${offer.items.length} шт.`);
+            logger.info(`Куплено: ${purchasedItem.name}. ${offer.items.length} шт.`);
           } else {
-            logger.debug(`> Ошибка: ${response.badRequest[0].errmsg}`);
+            logger.debug(`Ошибка: ${response.badRequest[0].errmsg}`);
           }
         }
       }
