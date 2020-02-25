@@ -79,7 +79,7 @@ const t = new Tarkov(process.env.hwid);
           logger.verbose(`Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
           await offer.buyWithRoubles(offer.items.length).then((response) => {
             if (response.items.new) {
-              logger.info(`Куплено: ${purchasedItem.name}. ${offer.items.length} шт.`);
+              logger.info(`Куплено: ${purchasedItem.name}. ${offer.items.length} шт. Стоимсоть: ${offer.requirementsCost}`);
             } else {
               logger.debug(`Ошибка: ${response.badRequest[0].errmsg}`);
             }
