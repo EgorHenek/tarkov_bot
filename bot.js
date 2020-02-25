@@ -27,7 +27,7 @@ const logger = winston.createLogger({
     new TelegramLogger({
       token: process.env.telegram_token,
       chatId: process.env.telegram_chat_id,
-      level: 'debug',
+      level: 'info',
       disableNotification: true,
       template: '{message}',
     }),
