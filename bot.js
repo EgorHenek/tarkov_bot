@@ -1,6 +1,7 @@
 const { Tarkov } = require('tarkov');
 const winston = require('winston');
 const TelegramLogger = require('winston-telegram');
+const purchasedItems = require('./items');
 
 const t = new Tarkov(process.env.hwid);
 
@@ -38,24 +39,6 @@ const t = new Tarkov(process.env.hwid);
     }));
   }
 
-  const purchasedItems = [
-    {
-      id: '57347ca924597744596b4e71',
-      name: 'видеокарта',
-      max_price: 100000,
-    },
-    {
-      id: '5c94bbff86f7747ee735c08f',
-      name: 'лаб. ключ',
-      max_price: 100000,
-    },
-    {
-      id: '5c1d0efb86f7744baf2e7b7b',
-      name: 'красная карта',
-      max_price: 17000000,
-    },
-  ];
-
   await t.login(process.env.email, process.env.password);
 
   const profiles = await t.getProfiles();
@@ -79,7 +62,7 @@ const t = new Tarkov(process.env.hwid);
           logger.verbose(`Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
           await offer.buyWithRoubles(offer.items.length).then((response) => {
             if (response.items.new) {
-              logger.info(`Куплено: ${purchasedItem.name}. ${offer.items.length} шт. Стоимсоть: ${offer.requirementsCost}`);
+              logger.info(`Куплено: ${purchasedItem.name}. ${offer.items.length} шт. Стоимость: ${offer.requirementsCost}`);
             } else {
               logger.debug(`Ошибка: ${response.badRequest[0].errmsg}`);
             }
