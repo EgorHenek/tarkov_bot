@@ -57,7 +57,6 @@ const t = new Tarkov(process.env.hwid);
           priceTo: purchasedItem.max_price,
           handbookId: purchasedItem.id,
         }).then(async (search) => {
-          logger.info(`Запрос на поиск ${purchasedItem.name}. rand=${rand}`);
           if (search.offers.length) {
             const offer = search.offers[0];
             logger.verbose(`Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
