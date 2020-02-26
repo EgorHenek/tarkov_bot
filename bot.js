@@ -39,43 +39,47 @@ const t = new Tarkov(process.env.hwid);
     }));
   }
 
-  await t.login(process.env.email, process.env.password);
+  await t.login(process.env.email, process.env.password).then(async () => {
+    const profiles = await t.getProfiles();
+    const profile = profiles.find((p) => p.savage);
+    await t.selectProfile(profile);
+    logger.debug(`Привет ${profile.Info.Nickname}`);
 
-  const profiles = await t.getProfiles();
-  const profile = profiles.find((p) => p.savage);
-  await t.selectProfile(profile);
-  logger.debug(`Привет ${profile.Info.Nickname}`);
+    await t.getI18n('ru');
 
-  await t.getI18n('ru');
-
-  await setInterval(async () => {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const purchasedItem of purchasedItems) {
-      // eslint-disable-next-line no-await-in-loop
-      await t.searchMarket(0, 15, {
-        currency: 1,
-        priceTo: purchasedItem.max_price,
-        handbookId: purchasedItem.id,
-      }).then(async (search) => {
-        if (search.offers.length) {
-          const offer = search.offers[0];
-          logger.verbose(`Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
-          await offer.buyWithRoubles(offer.items.length).then((response) => {
-            if (response.items.new) {
-              logger.info(`Куплено: ${purchasedItem.name}. ${offer.items.length} шт. Стоимость: ${offer.requirementsCost}`);
-            } else {
-              logger.debug(`Ошибка: ${response.badRequest[0].errmsg}`);
-            }
-          }).catch((e) => {
-            logger.error(`Работа завершена. Ошибка: ${e.message}`);
+    await setInterval(async () => {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const purchasedItem of purchasedItems) {
+        // eslint-disable-next-line no-await-in-loop
+        await t.searchMarket(0, 15, {
+          currency: 1,
+          priceTo: purchasedItem.max_price,
+          handbookId: purchasedItem.id,
+        }).then(async (search) => {
+          if (search.offers.length) {
+            const offer = search.offers[0];
+            logger.verbose(`Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
+            await offer.buyWithRoubles(offer.items.length).then((response) => {
+              if (response.items.new) {
+                logger.info(`Куплено: ${purchasedItem.name}. ${offer.items.length} шт. Стоимость: ${offer.requirementsCost}`);
+              } else {
+                logger.debug(`Ошибка: ${response.badRequest[0].errmsg}`);
+              }
+            }).catch(async (e) => {
+              await logger.error(`Работа завершена. Ошибка: ${e.message}`);
+              process.exit(1);
+            });
+          }
+        })
+          .catch(async (e) => {
+            await logger.error(`Работа завершена. Ошибка: ${e.message}`);
             process.exit(1);
           });
-        }
-      })
-        .catch((e) => {
-          logger.error(`Работа завершена. Ошибка: ${e.message}`);
-          process.exit(1);
-        });
-    }
-  }, 1000);
+      }
+    }, 1000);
+  })
+    .catch(async (e) => {
+      await logger.error(`Ошибка авторизации: ${e.message}`);
+      process.exit(1);
+    });
 })();
