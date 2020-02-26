@@ -47,7 +47,8 @@ const t = new Tarkov(process.env.hwid);
 
     await t.getI18n('ru');
 
-    await setInterval(async () => {
+    async function buy() {
+      const rand = Math.floor(Math.random() * (1500 - 750 + 1) + 750);
       // eslint-disable-next-line no-restricted-syntax
       for (const purchasedItem of purchasedItems) {
         // eslint-disable-next-line no-await-in-loop
@@ -56,6 +57,7 @@ const t = new Tarkov(process.env.hwid);
           priceTo: purchasedItem.max_price,
           handbookId: purchasedItem.id,
         }).then(async (search) => {
+          logger.info(`Запрос на поиск ${purchasedItem.name}. rand=${rand}`);
           if (search.offers.length) {
             const offer = search.offers[0];
             logger.verbose(`Найдена ${purchasedItem.name}: ${offer.requirementsCost}`);
@@ -76,10 +78,12 @@ const t = new Tarkov(process.env.hwid);
             process.exit(1);
           });
       }
-    }, 1000);
+      await setTimeout(buy, rand);
+    }
+    await buy();
   })
     .catch(async (e) => {
-      await logger.error(`Ошибка авторизации: ${e.message}`);
+      await logger.error(`Ошибка авторизации: ${e.errmsg}`);
       process.exit(1);
     });
 })();
